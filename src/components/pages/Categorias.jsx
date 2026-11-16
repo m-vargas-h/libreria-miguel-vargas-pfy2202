@@ -1,38 +1,36 @@
-import { useEffect, useState } from 'react'
-import { obtenerCategorias } from '../../api/libreriaApi'
-import Cargando from '../Cargando'
+import { RUTAS } from '../../api/libreriaApi'
+import { useConsulta } from '../../hooks/useConsulta'
+import BarraConsulta from '../BarraConsulta'
+import Boton from '../Boton'
+import EsqueletoTarjetas from '../EsqueletoTarjetas'
 import MensajeError from '../MensajeError'
 import TarjetaCategoria from '../TarjetaCategoria'
 
 function Categorias() {
-    const [resultado, setResultado] = useState({ categorias: null, error: null })
-
-    useEffect(() => {
-        // Evita actualizar el estado si el componente se desmonta antes de que llegue la respuesta
-        let activo = true
-        obtenerCategorias()
-            .then(categorias => activo && setResultado({ categorias, error: null }))
-            .catch(error => activo && setResultado({ categorias: null, error }))
-        return () => { activo = false }
-    }, [])
-
-    const { categorias, error } = resultado
-    const cargando = !categorias && !error
+    const consulta = useConsulta(RUTAS.categorias)
+    const { datos: categorias, cargando, error, recargar } = consulta
 
     return (
         <main className="contenedor">
             <h2 className="titulo-pagina">Categorías</h2>
 
-            {cargando && <Cargando mensaje="Cargando categorías..." />}
+            {cargando && <EsqueletoTarjetas cantidad={6} mensaje="Cargando categorías..." />}
 
-            {error && <MensajeError mensaje={error.message} />}
+            {error && !categorias && (
+                <MensajeError error={error} onReintentar={recargar}>
+                    <Boton variante="secundario" to="/">Volver al inicio</Boton>
+                </MensajeError>
+            )}
 
             {categorias && (
-                <div className="grilla">
-                    {categorias.map(categoria => (
-                        <TarjetaCategoria key={categoria.id} categoria={categoria} />
-                    ))}
-                </div>
+                <>
+                    <BarraConsulta consulta={consulta} texto={`${categorias.length} categorías disponibles`} />
+                    <div className="grilla">
+                        {categorias.map(categoria => (
+                            <TarjetaCategoria key={categoria.id} categoria={categoria} />
+                        ))}
+                    </div>
+                </>
             )}
         </main>
     )

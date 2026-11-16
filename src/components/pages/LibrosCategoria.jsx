@@ -1,62 +1,83 @@
-import { useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import { obtenerCategoria, obtenerLibrosPorCategoria } from '../../api/libreriaApi'
+import { RUTAS } from '../../api/libreriaApi'
+import { useConsulta } from '../../hooks/useConsulta'
+import BarraConsulta from '../BarraConsulta'
 import Boton from '../Boton'
-import Cargando from '../Cargando'
+import EsqueletoTarjetas from '../EsqueletoTarjetas'
 import MensajeError from '../MensajeError'
 import TarjetaLibro from '../TarjetaLibro'
 
 function LibrosCategoria() {
     const { categoriaId } = useParams()
-    // El resultado guarda el id consultado para saber si corresponde a la ruta actual
-    const [resultado, setResultado] = useState({ id: null })
+    // Dos consultas independientes que se hacen en paralelo.
+    // Si se viene desde la lista de categorías, la categoría ya está en caché y se muestra al instante.
+    const categoria = useConsulta(RUTAS.categoria(categoriaId))
+    const libros = useConsulta(RUTAS.librosCategoria(categoriaId))
 
-    useEffect(() => {
-        let activo = true
-        // Las dos peticiones son independientes, se hacen en paralelo
-        Promise.all([obtenerCategoria(categoriaId), obtenerLibrosPorCategoria(categoriaId)])
-            .then(([categoria, libros]) => activo && setResultado({ id: categoriaId, categoria, libros, error: null }))
-            .catch(error => activo && setResultado({ id: categoriaId, error }))
-        return () => { activo = false }
-    }, [categoriaId])
+    const volver = <Boton variante="secundario" to="/categorias">Volver a categorías</Boton>
 
-    const cargando = resultado.id !== categoriaId
-    const { categoria, libros, error } = resultado
-
-    if (cargando) {
-        return <main className="contenedor"><Cargando mensaje="Cargando libros..." /></main>
-    }
-
-    if (error) {
+    // Un 404 en cualquiera de las dos consultas significa que la categoría no existe
+    const noExiste = [categoria.error, libros.error].find(error => error?.tipo === 'noEncontrado')
+    if (noExiste) {
         return (
             <main className="contenedor">
-                <MensajeError mensaje={error.message}>
-                    <Boton variante="secundario" to="/categorias">Volver a categorías</Boton>
-                </MensajeError>
+                <MensajeError error={noExiste}>{volver}</MensajeError>
             </main>
         )
+    }
+
+    // Error sin datos de respaldo en alguna de las consultas
+    const errorSinDatos = (!categoria.datos && categoria.error) || (!libros.datos && libros.error)
+    const reintentar = () => {
+        if (categoria.error) categoria.recargar()
+        if (libros.error) libros.recargar()
     }
 
     return (
         <main className="contenedor">
             <div className="mb-6">
-                <h2 className="text-2xl font-bold">{categoria.nombre}</h2>
-                <p className="text-gray-600">{categoria.descripcion}</p>
+                {categoria.datos ? (
+                    <>
+                        <h2 className="text-2xl font-bold">{categoria.datos.nombre}</h2>
+                        <p className="text-gray-600">{categoria.datos.descripcion}</p>
+                    </>
+                ) : categoria.cargando ? (
+                    <div role="status" aria-label="Cargando categoría" className="animate-pulse">
+                        <div className="mb-2 h-7 w-48 rounded bg-gray-200" />
+                        <div className="h-4 w-72 rounded bg-gray-200" />
+                    </div>
+                ) : (
+                    <h2 className="text-2xl font-bold">Categoría</h2>
+                )}
             </div>
 
-            {libros.length === 0 ? (
-                <div className="alerta-info">
-                    Por ahora no hay libros en la categoría "{categoria.nombre}".
-                </div>
-            ) : (
-                <div className="grilla">
-                    {libros.map(libro => <TarjetaLibro key={libro.id} libro={libro} />)}
+            {errorSinDatos && (
+                <div className="mb-6">
+                    <MensajeError error={errorSinDatos} onReintentar={reintentar}>{volver}</MensajeError>
                 </div>
             )}
 
-            <div className="mt-6">
-                <Boton variante="secundario" to="/categorias">Volver a categorías</Boton>
-            </div>
+            {libros.cargando && <EsqueletoTarjetas cantidad={3} mensaje="Cargando libros..." />}
+
+            {libros.datos && (
+                <>
+                    <BarraConsulta
+                        consulta={libros}
+                        texto={libros.datos.length === 1 ? '1 libro' : `${libros.datos.length} libros`}
+                    />
+                    {libros.datos.length === 0 ? (
+                        <div className="alerta-info">
+                            Por ahora no hay libros en esta categoría. Revisa las demás categorías del catálogo.
+                        </div>
+                    ) : (
+                        <div className="grilla">
+                            {libros.datos.map(libro => <TarjetaLibro key={libro.id} libro={libro} />)}
+                        </div>
+                    )}
+                </>
+            )}
+
+            {!errorSinDatos && <div className="mt-6">{volver}</div>}
         </main>
     )
 }

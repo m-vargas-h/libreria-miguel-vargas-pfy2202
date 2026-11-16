@@ -49,11 +49,20 @@
         @apply rounded-md border border-red-300 bg-red-50 px-4 py-3 text-red-800;
     }
 
+    .alerta-advertencia {
+        @apply rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-amber-900;
+    }
+
     .alerta-info {
         @apply rounded-md border border-marca-300 bg-marca-50 px-4 py-3 text-marca-800;
     }
 
     .enlace {
-        @apply font-medium text-marca-700 hover:underline;
+        @apply font-medium text-marca-700 hover:underline disabled:pointer-events-none disabled:opacity-50;
+    }
+
+    /* Indicador de carga giratorio (el tamaño se define con size-*) */
+    .spinner {
+        @apply inline-block animate-spin rounded-full border-2 border-marca-300 border-t-marca-700;
     }
 }

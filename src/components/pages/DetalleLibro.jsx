@@ -1,34 +1,24 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
-import { obtenerLibro } from '../../api/libreriaApi'
+import { RUTAS } from '../../api/libreriaApi'
+import { useConsulta } from '../../hooks/useConsulta'
 import { formatearPrecio } from '../../utils/formato'
+import AvisoRespaldo from '../AvisoRespaldo'
 import Boton from '../Boton'
 import Cargando from '../Cargando'
 import MensajeError from '../MensajeError'
 
 function DetalleLibro() {
     const { libroId } = useParams()
-    const [resultado, setResultado] = useState({ id: null })
-
-    useEffect(() => {
-        let activo = true
-        obtenerLibro(libroId)
-            .then(libro => activo && setResultado({ id: libroId, libro, error: null }))
-            .catch(error => activo && setResultado({ id: libroId, error }))
-        return () => { activo = false }
-    }, [libroId])
-
-    const cargando = resultado.id !== libroId
-    const { libro, error } = resultado
+    const { datos: libro, cargando, error, desdeRespaldo, fechaRespaldo, recargar } = useConsulta(RUTAS.libro(libroId))
 
     if (cargando) {
         return <main className="contenedor"><Cargando mensaje="Cargando libro..." /></main>
     }
 
-    if (error) {
+    if (error && !libro) {
         return (
             <main className="contenedor">
-                <MensajeError mensaje={error.message}>
+                <MensajeError error={error} onReintentar={recargar}>
                     <Boton variante="secundario" to="/categorias">Ver categorías</Boton>
                 </MensajeError>
             </main>
@@ -42,6 +32,8 @@ function DetalleLibro() {
                 {' / '}
                 <Link to={`/categorias/${libro.categoria.id}`} className="enlace">{libro.categoria.nombre}</Link>
             </nav>
+
+            {desdeRespaldo && <AvisoRespaldo error={error} fecha={fechaRespaldo} onReintentar={recargar} />}
 
             <article className="tarjeta max-w-2xl overflow-hidden">
                 <div className="bg-marca-700 px-5 py-3 text-white">
