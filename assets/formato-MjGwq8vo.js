@@ -1,0 +1,1 @@
+var e=e=>`$ ${e.toLocaleString(`es-CL`)}`;export{e as t};

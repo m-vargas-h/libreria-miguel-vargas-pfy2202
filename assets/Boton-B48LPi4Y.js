@@ -1,0 +1,1 @@
+import{n as e,r as t}from"./index-jca5sttc.js";var n=e(),r={primario:`btn-primario`,secundario:`btn-secundario`};function i({variante:e=`primario`,to:i,type:a=`button`,className:o=``,children:s,...c}){let l=[`btn`,r[e],o].filter(Boolean).join(` `);return i?(0,n.jsx)(t,{to:i,className:l,...c,children:s}):(0,n.jsx)(`button`,{type:a,className:l,...c,children:s})}export{i as t};
