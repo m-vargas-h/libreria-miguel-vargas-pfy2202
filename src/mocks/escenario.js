@@ -5,6 +5,7 @@ export const ESCENARIOS = {
     error500: 'Error 500 del servidor',
     sinConexion: 'Sin conexión (falla de red)',
     lento: 'Respuesta lenta (tiempo de espera agotado)',
+    formatoInvalido: 'Respuesta con formato inválido',
 }
 
 const CLAVE = 'escenario-mock'

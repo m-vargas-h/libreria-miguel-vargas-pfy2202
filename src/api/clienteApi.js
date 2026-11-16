@@ -1,8 +1,5 @@
+import { TIEMPO_ESPERA, URL_BASE_API } from '../constants/api'
 import { ErrorApi, errorDesdeRespuesta } from './errores'
-
-const URL_BASE = '/api'
-// Tiempo máximo de espera de una respuesta (ms)
-export const TIEMPO_ESPERA = 5000
 
 // Realiza un GET a la API y traduce cualquier falla a un ErrorApi.
 // "signal" permite cancelar la petición cuando ya nadie necesita la respuesta.
@@ -11,7 +8,7 @@ export async function pedir(ruta, signal) {
     let respuesta
 
     try {
-        respuesta = await fetch(`${URL_BASE}${ruta}`, { signal: senal })
+        respuesta = await fetch(`${URL_BASE_API}${ruta}`, { signal: senal })
     } catch (error) {
         // Cancelación intencional: se propaga tal cual para que se ignore
         if (signal.aborted) throw error
@@ -26,5 +23,9 @@ export async function pedir(ruta, signal) {
         throw errorDesdeRespuesta(respuesta.status, cuerpo)
     }
 
-    return respuesta.json()
+    try {
+        return await respuesta.json()
+    } catch {
+        throw new ErrorApi('formatoInvalido', 'La respuesta del servidor no es un JSON válido.')
+    }
 }

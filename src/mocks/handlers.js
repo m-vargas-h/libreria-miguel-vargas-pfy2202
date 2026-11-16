@@ -21,6 +21,10 @@ const conEscenario = (resolver) => async (info) => {
     if (escenario === 'error500') {
         return HttpResponse.json({ mensaje: 'Error interno del servidor' }, { status: 500 })
     }
+    if (escenario === 'formatoInvalido') {
+        // Respuesta 200 con una estructura distinta a la esperada por el frontend
+        return HttpResponse.json({ resultado: 'estructura inesperada' })
+    }
     return resolver(info)
 }
 

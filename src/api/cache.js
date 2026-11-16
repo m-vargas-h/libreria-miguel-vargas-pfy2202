@@ -1,8 +1,9 @@
+import { VIGENCIA_CACHE } from '../constants/api'
+
 // Caché en memoria de respuestas de la API.
-// - Guarda cada respuesta por ruta durante VIGENCIA ms para no repetir peticiones.
+// - Guarda cada respuesta por ruta durante VIGENCIA_CACHE ms para no repetir peticiones.
 // - Comparte una misma petición en curso entre todos los componentes que la piden (sin duplicados).
 // - Cancela la petición si todos los componentes que la esperaban se desmontan.
-const VIGENCIA = 5 * 60 * 1000
 
 const respuestas = new Map()   // ruta -> { datos, fecha }
 const enCurso = new Map()      // ruta -> { promesa, controlador, suscriptores }
@@ -10,7 +11,7 @@ const enCurso = new Map()      // ruta -> { promesa, controlador, suscriptores }
 export function leerCache(ruta) {
     const entrada = respuestas.get(ruta)
     if (!entrada) return null
-    return { ...entrada, vigente: Date.now() - entrada.fecha < VIGENCIA }
+    return { ...entrada, vigente: Date.now() - entrada.fecha < VIGENCIA_CACHE }
 }
 
 export function guardarEnCache(ruta, datos) {

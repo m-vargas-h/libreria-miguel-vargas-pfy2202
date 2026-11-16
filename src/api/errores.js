@@ -16,6 +16,10 @@ export const TIPOS_ERROR = {
         titulo: 'El servidor está tardando demasiado',
         sugerencia: 'La respuesta no llegó a tiempo. Intenta nuevamente en unos momentos.',
     },
+    formatoInvalido: {
+        titulo: 'Respuesta con formato inválido',
+        sugerencia: 'El servidor envió datos que no se pueden mostrar. Intenta nuevamente más tarde.',
+    },
     desconocido: {
         titulo: 'Ocurrió un error inesperado',
         sugerencia: 'Intenta nuevamente. Si el problema continúa, vuelve más tarde.',
