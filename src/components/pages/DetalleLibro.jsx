@@ -5,11 +5,12 @@ import { formatearPrecio } from '../../utils/formato'
 import AvisoRespaldo from '../AvisoRespaldo'
 import Boton from '../Boton'
 import Cargando from '../Cargando'
+import IndicadorActualizando from '../IndicadorActualizando'
 import MensajeError from '../MensajeError'
 
 function DetalleLibro() {
     const { libroId } = useParams()
-    const { datos: libro, cargando, error, desdeRespaldo, fechaRespaldo, recargar } = useConsulta(RUTAS.libro(libroId))
+    const { datos: libro, cargando, actualizando, error, desdeRespaldo, fechaRespaldo, recargar } = useConsulta(RUTAS.libro(libroId))
 
     if (cargando) {
         return <main className="contenedor"><Cargando mensaje="Cargando libro..." /></main>
@@ -27,11 +28,14 @@ function DetalleLibro() {
 
     return (
         <main className="contenedor">
-            <nav className="mb-4 text-sm text-gray-600">
-                <Link to="/categorias" className="enlace">Categorías</Link>
-                {' / '}
-                <Link to={`/categorias/${libro.categoria.id}`} className="enlace">{libro.categoria.nombre}</Link>
-            </nav>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <nav className="text-sm text-gray-600">
+                    <Link to="/categorias" className="enlace">Categorías</Link>
+                    {' / '}
+                    <Link to={`/categorias/${libro.categoria.id}`} className="enlace">{libro.categoria.nombre}</Link>
+                </nav>
+                {actualizando && <IndicadorActualizando />}
+            </div>
 
             {desdeRespaldo && <AvisoRespaldo error={error} fecha={fechaRespaldo} onReintentar={recargar} />}
 

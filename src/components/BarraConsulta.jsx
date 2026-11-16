@@ -1,4 +1,5 @@
 import AvisoRespaldo from './AvisoRespaldo'
+import IndicadorActualizando from './IndicadorActualizando'
 
 // Botón "Actualizar" con indicador de actualización y aviso de datos de respaldo
 function BarraConsulta({ consulta, texto }) {
@@ -9,11 +10,7 @@ function BarraConsulta({ consulta, texto }) {
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <p className="text-sm text-gray-600">{texto}</p>
                 <div className="flex items-center gap-3">
-                    {actualizando && (
-                        <span role="status" className="flex items-center gap-2 text-sm text-gray-600">
-                            <span className="spinner size-4" /> Actualizando...
-                        </span>
-                    )}
+                    {actualizando && <IndicadorActualizando />}
                     <button type="button" className="enlace text-sm" onClick={recargar} disabled={actualizando}>
                         ↻ Actualizar
                     </button>

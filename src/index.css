@@ -9,6 +9,14 @@
     --color-marca-700: #4338ca;
     --color-marca-800: #3730a3;
     --color-marca-900: #312e81;
+
+    /* Animación de la barra de carga de páginas */
+    --animate-progreso: progreso 1s ease-in-out infinite;
+
+    @keyframes progreso {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(300%); }
+    }
 }
 
 /* Clases reutilizables con @apply para evitar repetir utilidades en el JSX */

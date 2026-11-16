@@ -2,13 +2,13 @@ import { Suspense } from 'react'
 import { Outlet } from 'react-router'
 import Header from './Header'
 import Footer from './Footer'
-import Cargando from './Cargando'
+import CargandoPagina from './CargandoPagina'
 
 function Layout() {
     return (
         <div className="flex min-h-screen flex-col bg-gray-50 text-gray-800">
             <Header />
-            <Suspense fallback={<Cargando />}>
+            <Suspense fallback={<CargandoPagina />}>
                 <Outlet />
             </Suspense>
             <Footer />
